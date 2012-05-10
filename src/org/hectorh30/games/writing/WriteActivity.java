@@ -14,7 +14,6 @@ import org.anddev.andengine.entity.modifier.IEntityModifier.IEntityModifierListe
 import org.anddev.andengine.entity.modifier.LoopEntityModifier;
 import org.anddev.andengine.entity.modifier.MoveXModifier;
 import org.anddev.andengine.entity.modifier.SequenceEntityModifier;
-import org.anddev.andengine.entity.primitive.Line;
 import org.anddev.andengine.entity.primitive.Rectangle;
 import org.anddev.andengine.entity.scene.Scene;
 import org.anddev.andengine.entity.scene.background.ColorBackground;
@@ -27,7 +26,6 @@ import org.anddev.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextur
 import org.anddev.andengine.opengl.texture.region.TextureRegion;
 import org.anddev.andengine.ui.activity.BaseGameActivity;
 import org.anddev.andengine.util.modifier.IModifier;
-import org.hectorh30.games.shapes.Ellipse;
 import org.hectorh30.games.writing.sprites.PencilSprite;
 import org.hectorh30.games.writing.sprites.StepSprite;
 
@@ -152,27 +150,29 @@ public class WriteActivity extends BaseGameActivity {
 		
 		stepsPool = new StepsPool(letter,this.mFont,redStepTextureRegion,blueStepTextureRegion,greenStepTextureRegion);
 		
+		Log.d(tag,"Letter size: "+letter.getWidth()+", "+letter.getHeight());
+		
 		// Data from XML
-		final LetterPath path1 = new LetterPath(140f,-40f);
+		final LetterPath path1 = new LetterPath(132f,-36f);
 		path1.addStep(62f, 140f);
 		path1.addStep(62f, 327f);
 		path1.addStep(62f, 510f);
 		letterPaths.add(path1);
 		
 		final LetterPath path2 = new LetterPath(140f,-40f);
-		path2.addStep(215f, 8f);
-		path2.addStep(360f, 52f);
-		path2.addStep(370f, 185f);
-		path2.addStep(245f, 255f);
-		path2.addStep(100f, 255f);
+		path2.addStep(180f, 10f);
+		path2.addStep(335f, 34f);
+		path2.addStep(375f, 175f);
+		path2.addStep(238f, 256f);
+		path2.addStep(83f, 259f);
 		letterPaths.add(path2);
 		
-		final LetterPath path3 = new LetterPath(140f,-40f);
-		path3.addStep(215f, 308f);
-		path3.addStep(360f, 352f);
-		path3.addStep(370f, 485f);
-		path3.addStep(245f, 555f);
-		path3.addStep(100f, 555f);
+		final LetterPath path3 = new LetterPath(132f,196f);
+		path3.addStep(238f, 256f);
+		path3.addStep(389f, 325f);
+		path3.addStep(397f, 483f);
+		path3.addStep(250f, 532f);
+		path3.addStep(84f, 532f);
 		letterPaths.add(path3);
 		
 		currentPath = letterPaths.get(0);
@@ -273,9 +273,21 @@ public class WriteActivity extends BaseGameActivity {
 
 					@Override
 					public void onModifierFinished(final IModifier<IEntity> pEntityModifier, final IEntity pEntity) {
-						showStepSprites();
-//						showPath(letterPaths.get(0));
-						WriteActivity.this.allowPencilMove = true;		
+						if (WriteActivity.this.currentPath == letterPaths.get(0))
+						{
+							showStepSprites();
+							WriteActivity.this.allowPencilMove = true;
+						} else {
+							for (StepSprite stepSprite : stepSprites)
+							{
+								stepSprite.visible = false;
+								stepSprite.setAlpha(0f);
+								stepsPool.recyclePoolItem(stepSprite);
+							}
+							WriteActivity.this.currentPath = letterPaths.get(0);
+							showPath(WriteActivity.this.currentPath);
+							WriteActivity.this.allowPencilMove = true;
+						}
 					}
 				}
 			);
@@ -336,11 +348,20 @@ public class WriteActivity extends BaseGameActivity {
 	public void nextPath()
 	{
 		for (StepSprite stepSprite : stepSprites){
-			stepsPool.recyclePoolItem(stepSprite);
+			if (stepSprite.recyclable)
+				stepsPool.recyclePoolItem(stepSprite);
 		}
 		if(letterPaths.indexOf(currentPath) + 1 < letterPaths.size())
+		{
 			currentPath = letterPaths.get(letterPaths.indexOf(currentPath) + 1);
-		
-		showPath(currentPath);
+			showPath(currentPath);
+		} else {
+			WriteActivity.this.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					Toast.makeText(WriteActivity.this, "Oh yeah!", Toast.LENGTH_SHORT).show();
+				}
+			});
+		}
 	}
 }

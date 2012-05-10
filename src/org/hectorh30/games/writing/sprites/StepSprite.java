@@ -30,6 +30,7 @@ public class StepSprite extends PixelPerfectSprite {
 	
 	public float initialRelX, initialRelY, letterSpriteX, letterSpriteY; 
 	public boolean visible = false;
+	public boolean recyclable = false;
 	
 	ChangeableText number;
 	
@@ -77,6 +78,15 @@ public class StepSprite extends PixelPerfectSprite {
 			this.visible = false;
 			SequenceEntityModifier modifier = 
 					new SequenceEntityModifier(
+						new IEntityModifierListener() {
+							@Override
+							public void onModifierStarted(final IModifier<IEntity> pModifier, final IEntity pItem) { }
+		
+							@Override
+							public void onModifierFinished(final IModifier<IEntity> pEntityModifier, final IEntity pEntity) {
+								StepSprite.this.recyclable = true;
+							}
+						},
 						new DelayModifier(StepSprite.this.hideDelay),
 						new ParallelEntityModifier(
 							new SequenceEntityModifier(
@@ -89,7 +99,6 @@ public class StepSprite extends PixelPerfectSprite {
 							)
 						)
 					);
-			Log.d(tag, "recycling: "+this.number.getText());
 			this.registerEntityModifier(modifier);
 		}
 	}
@@ -98,6 +107,7 @@ public class StepSprite extends PixelPerfectSprite {
 	{
 		if(!this.visible)
 		{
+			this.recyclable = false;
 			this.visible = true;
 			
 			//this.setPosition(this.getInitialX(),this.getInitialY());
