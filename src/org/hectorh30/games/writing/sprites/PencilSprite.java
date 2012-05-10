@@ -32,6 +32,7 @@ public class PencilSprite extends Sprite {
 	private float LINE_WIDTH = 3f;
 	private float CIRCLE_RATE = 10f; // pixeles por circulo
 	public Sprite pointer;
+	public boolean moveStarted = false;
 	
 	public PencilSprite(
 			PixelPerfectSprite letterSprite, 
@@ -77,6 +78,7 @@ public class PencilSprite extends Sprite {
 		case TouchEvent.ACTION_DOWN:
 			deltaX = pAreaTouchEvent.getX() - this.getX();
 			deltaY = pAreaTouchEvent.getY() - this.getY();
+			this.moveStarted = true;
 			
 //			this.lineInitPosX = pAreaTouchEvent.getX() - deltaX;
 //			this.lineInitPosY = pAreaTouchEvent.getY() - deltaY;
@@ -84,7 +86,7 @@ public class PencilSprite extends Sprite {
 			break;
 		
 		case TouchEvent.ACTION_MOVE:
-			if(activity.allowPencilMove){
+			if(activity.allowPencilMove && this.moveStarted){
 								
 				this.lineEndPosX = pAreaTouchEvent.getX() - deltaX + 2f;
 				this.lineEndPosY = pAreaTouchEvent.getY() - deltaY + this.getHeight() - 2f;
@@ -124,7 +126,8 @@ public class PencilSprite extends Sprite {
 			}
 			break;
 		case TouchEvent.ACTION_UP:
-			activity.allowPencilMove = true;
+			//activity.allowPencilMove = true;
+			this.moveStarted = false;
 			deltaX = 0f;
 			deltaY = 0f;
 			break;

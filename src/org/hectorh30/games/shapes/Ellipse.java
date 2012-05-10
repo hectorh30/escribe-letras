@@ -8,8 +8,6 @@ import org.anddev.andengine.entity.shape.IShape;
 import org.anddev.andengine.opengl.buffer.BufferObjectManager;
 import org.anddev.andengine.opengl.util.GLHelper;
 
-import android.util.Log;
-
 public class Ellipse extends GLShape {
   private static final float LINEWIDTH_DEFAULT = 1.0f;
   private static final int SEGMENTS_DEFAULT = 50;
@@ -51,7 +49,6 @@ public class Ellipse extends GLShape {
 	    super(pX, pY);
 	    this.width = width;
 	    this.height = height;
-//	    this.filledMode = (filled) ? GL10.GL_TRIANGLE_FAN : GL10.GL_LINE_LOOP;
 	    this.filledMode = GL10.GL_TRIANGLE_FAN;
 	    this.segments = segments;
 	    this.lineWidth = lineWidth;

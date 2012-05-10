@@ -76,7 +76,7 @@ public class WriteActivity extends BaseGameActivity {
 	private int FONT_SIZE = 60;
 	
 	private PixelPerfectSprite letter, pointer;
-	private String tag = "StartActivity";
+	final private String tag = "StartActivity";
 	
 	public Scene scene, drawingScene;
 	public boolean allowPencilMove = true;
@@ -155,7 +155,6 @@ public class WriteActivity extends BaseGameActivity {
 		
 		// Data from XML
 		final LetterPath path1 = new LetterPath(140f,-40f);
-//		final LetterPath path1 = new LetterPath(340f,200f);
 		path1.addStep(62f, 140f);
 		path1.addStep(62f, 327f);
 		path1.addStep(62f, 510f);
@@ -254,6 +253,7 @@ public class WriteActivity extends BaseGameActivity {
 	
 	public void resetLetter(){		
 		this.allowPencilMove  = false;
+		this.pencil.moveStarted = false;
 		
 		runOnUpdateThread(new Runnable() {
 			@Override
@@ -270,21 +270,21 @@ public class WriteActivity extends BaseGameActivity {
     	LoopEntityModifier lem = 
 			new LoopEntityModifier(
 				new SequenceEntityModifier(
-					new IEntityModifierListener() {
-						@Override
-						public void onModifierStarted(final IModifier<IEntity> pModifier, final IEntity pItem) { }
-	
-						@Override
-						public void onModifierFinished(final IModifier<IEntity> pEntityModifier, final IEntity pEntity) {
-							showStepSprites();
-							//drawPath(letterPaths.get(0));
-							//LetterActivity.this.allowPencilMove = true;
-						}
-					},
 					new MoveXModifier(0.05f, currentX, currentX + 12),
 					new MoveXModifier(0.05f, currentX + 12, currentX - 24),
 					new MoveXModifier(0.05f, currentX - 24, currentX)
-				),3
+				),3,
+				new IEntityModifierListener() {
+					@Override
+					public void onModifierStarted(final IModifier<IEntity> pModifier, final IEntity pItem) { }
+
+					@Override
+					public void onModifierFinished(final IModifier<IEntity> pEntityModifier, final IEntity pEntity) {
+						showStepSprites();
+						//drawPath(letterPaths.get(0));
+						WriteActivity.this.allowPencilMove = true;		
+					}
+				}
 			);
     	lem.setRemoveWhenFinished(true);
 		letter.registerEntityModifier(lem);
@@ -320,6 +320,7 @@ public class WriteActivity extends BaseGameActivity {
 		stepSprites.clear();
 		
 		this.allowPencilMove  = false;
+		this.pencil.moveStarted = false;
 		
 		this.pencil.setInitialRelPosition(path.getInitialRelX(),path.getInitialRelY());
 		this.pencil.setToInitialPosition();
