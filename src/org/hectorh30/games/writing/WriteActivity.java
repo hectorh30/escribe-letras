@@ -104,7 +104,6 @@ public class WriteActivity extends BaseGameActivity {
 		this.letterTextureRegion = PixelPerfectTextureRegionFactory.createFromAsset(this.letterTexture, this, "gfx/Letra-B-M-inverso.png", 0, 0);
 		
 		
-		
 		this.mFontTexture = new BitmapTextureAtlas(512, 512, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		this.mFont = FontFactory.createFromAsset(mFontTexture, this, "font/Crayon.ttf", FONT_SIZE, true, Color.WHITE);
 		
@@ -176,18 +175,15 @@ public class WriteActivity extends BaseGameActivity {
 		path3.addStep(100f, 555f);
 		letterPaths.add(path3);
 		
-		currentPath = path1;
-		
-		//pencil = new PencilSprite(letter, 140f, -40f, this.pencilTextureRegion,this);
+		currentPath = letterPaths.get(0);
 		pointer = new PixelPerfectSprite(0f, 0f, this.pointerTextureRegion);
 		pencil = new PencilSprite(letter, currentPath.getInitialRelX(), currentPath.getInitialRelY(), this.pencilTextureRegion,this,pointer);
-//		pencil = new PencilSprite(letter, 140f, -40f, this.pencilTextureRegion,this,pointer);
 		
 		stepsLayerEntity = new Entity();
 		stepSprites = new ArrayList<StepSprite>();
 
 		// Logic for letter steps (paths)
-//		drawPath(currentPath);
+		showPath(currentPath);
 		
 		// Scene attaching
 //		scene.attachChild(pointer);
@@ -232,11 +228,10 @@ public class WriteActivity extends BaseGameActivity {
 					if (stepSprite.collidesWith(pointer))
 					{
 						stepSprite.animationHide();
+						
 						if(stepSprite.getInitialRelX() == currentPath.getLastStepRelX() && stepSprite.getInitialRelY() == currentPath.getLastStepRelY())
 						{
-//							Log.d(tag,"Is last step");
-							//drawPath(path2);
-							resetLetter();
+							nextPath();
 						}
 					}
 				}
@@ -253,7 +248,7 @@ public class WriteActivity extends BaseGameActivity {
 	
 	public void resetLetter(){		
 		this.allowPencilMove  = false;
-		this.pencil.moveStarted = false;
+		this.pencil.moveStarted = false; 
 		
 		runOnUpdateThread(new Runnable() {
 			@Override
@@ -264,9 +259,7 @@ public class WriteActivity extends BaseGameActivity {
 		
 		this.pencil.setToInitialPosition();
 		
-		//pointer.setPosition(pointer.getInitialX(),pointer.getInitialY());
-		
-		float currentX  = letter.getX();        
+		float currentX  = letter.getX();
     	LoopEntityModifier lem = 
 			new LoopEntityModifier(
 				new SequenceEntityModifier(
@@ -281,14 +274,13 @@ public class WriteActivity extends BaseGameActivity {
 					@Override
 					public void onModifierFinished(final IModifier<IEntity> pEntityModifier, final IEntity pEntity) {
 						showStepSprites();
-						//drawPath(letterPaths.get(0));
+//						showPath(letterPaths.get(0));
 						WriteActivity.this.allowPencilMove = true;		
 					}
 				}
 			);
     	lem.setRemoveWhenFinished(true);
 		letter.registerEntityModifier(lem);
-    	
     	
     	LoopEntityModifier lem2 =
 			new LoopEntityModifier(
@@ -315,11 +307,9 @@ public class WriteActivity extends BaseGameActivity {
 		}
 	}
 	
-	public void drawPath(LetterPath path)
+	public void showPath(LetterPath path)
 	{
 		stepSprites.clear();
-		
-		this.allowPencilMove  = false;
 		this.pencil.moveStarted = false;
 		
 		this.pencil.setInitialRelPosition(path.getInitialRelX(),path.getInitialRelY());
@@ -334,9 +324,23 @@ public class WriteActivity extends BaseGameActivity {
 			step.setShowDelay(0.3f * (i+1));
 			step.setHideDelay(0.05f);
 			stepSprites.add(step);
-			stepsLayerEntity.attachChild(step);
+			
+			if (stepsLayerEntity.getChildIndex(step) == -1)
+				stepsLayerEntity.attachChild(step);
 		}
 		showStepSprites();
+		
 		this.allowPencilMove  = true;
+	}
+	
+	public void nextPath()
+	{
+		for (StepSprite stepSprite : stepSprites){
+			stepsPool.recyclePoolItem(stepSprite);
+		}
+		if(letterPaths.indexOf(currentPath) + 1 < letterPaths.size())
+			currentPath = letterPaths.get(letterPaths.indexOf(currentPath) + 1);
+		
+		showPath(currentPath);
 	}
 }

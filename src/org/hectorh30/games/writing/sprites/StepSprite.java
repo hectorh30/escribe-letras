@@ -5,10 +5,10 @@ import javax.microedition.khronos.opengles.GL10;
 import org.anddev.andengine.entity.IEntity;
 import org.anddev.andengine.entity.modifier.AlphaModifier;
 import org.anddev.andengine.entity.modifier.DelayModifier;
+import org.anddev.andengine.entity.modifier.IEntityModifier.IEntityModifierListener;
 import org.anddev.andengine.entity.modifier.ParallelEntityModifier;
 import org.anddev.andengine.entity.modifier.ScaleModifier;
 import org.anddev.andengine.entity.modifier.SequenceEntityModifier;
-import org.anddev.andengine.entity.modifier.IEntityModifier.IEntityModifierListener;
 import org.anddev.andengine.entity.shape.IShape;
 import org.anddev.andengine.entity.text.ChangeableText;
 import org.anddev.andengine.opengl.font.Font;
@@ -16,6 +16,9 @@ import org.anddev.andengine.util.HorizontalAlign;
 import org.anddev.andengine.util.modifier.IModifier;
 import org.anddev.andengine.util.modifier.ease.EaseBackOut;
 import org.anddev.andengine.util.modifier.ease.EaseQuadIn;
+import org.hectorh30.games.writing.StepsPool;
+
+import android.util.Log;
 
 import com.qwerjk.andengine.entity.sprite.PixelPerfectSprite;
 import com.qwerjk.andengine.opengl.texture.region.PixelPerfectTextureRegion;
@@ -28,7 +31,9 @@ public class StepSprite extends PixelPerfectSprite {
 	public float initialRelX, initialRelY, letterSpriteX, letterSpriteY; 
 	public boolean visible = false;
 	
-	ChangeableText number;  
+	ChangeableText number;
+	
+	final private String tag = "StartActivity";
 	
 	public StepSprite(
 			PixelPerfectSprite letterSprite, 
@@ -69,9 +74,8 @@ public class StepSprite extends PixelPerfectSprite {
 	public void animationHide()
 	{
 		if(this.visible){
-		
 			this.visible = false;
-			SequenceEntityModifier showModifier = 
+			SequenceEntityModifier modifier = 
 					new SequenceEntityModifier(
 						new DelayModifier(StepSprite.this.hideDelay),
 						new ParallelEntityModifier(
@@ -85,8 +89,8 @@ public class StepSprite extends PixelPerfectSprite {
 							)
 						)
 					);
-			showModifier.setRemoveWhenFinished(true);
-			this.registerEntityModifier(showModifier);
+			Log.d(tag, "recycling: "+this.number.getText());
+			this.registerEntityModifier(modifier);
 		}
 	}
 	
