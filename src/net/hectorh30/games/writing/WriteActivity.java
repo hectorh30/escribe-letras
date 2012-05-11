@@ -1,6 +1,9 @@
-package org.hectorh30.games.writing;
+package net.hectorh30.games.writing;
 
 import java.util.ArrayList;
+
+import net.hectorh30.games.writing.sprites.PencilSprite;
+import net.hectorh30.games.writing.sprites.StepSprite;
 
 import org.anddev.andengine.engine.Engine;
 import org.anddev.andengine.engine.camera.Camera;
@@ -26,8 +29,6 @@ import org.anddev.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextur
 import org.anddev.andengine.opengl.texture.region.TextureRegion;
 import org.anddev.andengine.ui.activity.BaseGameActivity;
 import org.anddev.andengine.util.modifier.IModifier;
-import org.hectorh30.games.writing.sprites.PencilSprite;
-import org.hectorh30.games.writing.sprites.StepSprite;
 
 import android.graphics.Color;
 import android.util.Log;
@@ -39,8 +40,8 @@ import com.qwerjk.andengine.opengl.texture.region.PixelPerfectTextureRegionFacto
 
 public class WriteActivity extends BaseGameActivity {
 
-	private static final int CAMERA_WIDTH = 800;
-	private static final int CAMERA_HEIGHT = 1280;
+	private static final int CAMERA_WIDTH = Utils.CAMERA_WIDTH;
+	private static final int CAMERA_HEIGHT = Utils.CAMERA_HEIGHT;
 
 	private Camera mCamera;
 	private BitmapTextureAtlas 
@@ -99,7 +100,8 @@ public class WriteActivity extends BaseGameActivity {
 		
 		// Data from XML
 		this.letterTexture = new BitmapTextureAtlas(1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-		this.letterTextureRegion = PixelPerfectTextureRegionFactory.createFromAsset(this.letterTexture, this, "gfx/Letra-B-M-inverso.png", 0, 0);
+//		this.letterTextureRegion = PixelPerfectTextureRegionFactory.createFromAsset(this.letterTexture, this, "gfx/Letra-B-M-inverso.png", 0, 0);
+		this.letterTextureRegion = PixelPerfectTextureRegionFactory.createFromAsset(this.letterTexture, this, "gfx/Letra-C-M-inverso.png", 0, 0);
 		
 		
 		this.mFontTexture = new BitmapTextureAtlas(512, 512, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
@@ -153,6 +155,9 @@ public class WriteActivity extends BaseGameActivity {
 		Log.d(tag,"Letter size: "+letter.getWidth()+", "+letter.getHeight());
 		
 		// Data from XML
+		
+//		Letra-B-M-inverso.png paths
+		/*
 		final LetterPath path1 = new LetterPath(132f,-36f);
 		path1.addStep(62f, 140f);
 		path1.addStep(62f, 327f);
@@ -174,6 +179,16 @@ public class WriteActivity extends BaseGameActivity {
 		path3.addStep(250f, 532f);
 		path3.addStep(84f, 532f);
 		letterPaths.add(path3);
+		*/
+		
+//		Letra-C-M-inverso.png paths
+		final LetterPath path1 = new LetterPath(478f,-15f);
+		path1.addStep(245f,0f);
+		path1.addStep(97f,102f);
+		path1.addStep(60f,290f);
+		path1.addStep(129f,483f);
+		path1.addStep(336f,535f);
+		letterPaths.add(path1);
 		
 		currentPath = letterPaths.get(0);
 		pointer = new PixelPerfectSprite(0f, 0f, this.pointerTextureRegion);
@@ -186,13 +201,13 @@ public class WriteActivity extends BaseGameActivity {
 		showPath(currentPath);
 		
 		// Scene attaching
-//		scene.attachChild(pointer);
+		scene.attachChild(pointer);
 		scene.attachChild(rectangle);
 		scene.attachChild(letter);
 		scene.attachChild(stepsLayerEntity);
 		scene.attachChild(drawingScene);
 		scene.attachChild(pencil);
-		scene.attachChild(pointer);
+//		scene.attachChild(pointer);
 		
 		/*
 		for(int i = (int)letter.getX(); i < CAMERA_WIDTH; i+=50)

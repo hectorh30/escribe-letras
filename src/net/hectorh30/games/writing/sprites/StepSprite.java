@@ -1,6 +1,8 @@
-package org.hectorh30.games.writing.sprites;
+package net.hectorh30.games.writing.sprites;
 
 import javax.microedition.khronos.opengles.GL10;
+
+import net.hectorh30.games.writing.StepsPool;
 
 import org.anddev.andengine.entity.IEntity;
 import org.anddev.andengine.entity.modifier.AlphaModifier;
@@ -16,7 +18,6 @@ import org.anddev.andengine.util.HorizontalAlign;
 import org.anddev.andengine.util.modifier.IModifier;
 import org.anddev.andengine.util.modifier.ease.EaseBackOut;
 import org.anddev.andengine.util.modifier.ease.EaseQuadIn;
-import org.hectorh30.games.writing.StepsPool;
 
 import android.util.Log;
 

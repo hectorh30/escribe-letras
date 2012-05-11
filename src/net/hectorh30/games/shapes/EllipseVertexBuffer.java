@@ -1,4 +1,4 @@
-package org.hectorh30.games.shapes;
+package net.hectorh30.games.shapes;
 
 
 import org.anddev.andengine.opengl.util.FastFloatBuffer;

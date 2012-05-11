@@ -1,10 +1,11 @@
-package org.hectorh30.games.writing;
+package net.hectorh30.games.writing;
 
 import java.util.Random;
 
+import net.hectorh30.games.writing.sprites.StepSprite;
+
 import org.anddev.andengine.opengl.font.Font;
 import org.anddev.andengine.util.pool.GenericPool;
-import org.hectorh30.games.writing.sprites.StepSprite;
 
 import android.util.Log;
 

@@ -1,4 +1,4 @@
-package org.hectorh30.games.writing;
+package net.hectorh30.games.writing;
 
 import java.util.ArrayList;
 

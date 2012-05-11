@@ -1,11 +1,12 @@
-package org.hectorh30.games.writing.sprites;
+package net.hectorh30.games.writing.sprites;
+
+import net.hectorh30.games.shapes.Ellipse;
+import net.hectorh30.games.writing.WriteActivity;
 
 import org.anddev.andengine.entity.sprite.Sprite;
 import org.anddev.andengine.input.touch.TouchEvent;
 import org.anddev.andengine.opengl.texture.region.TextureRegion;
 import org.anddev.andengine.util.MathUtils;
-import org.hectorh30.games.shapes.Ellipse;
-import org.hectorh30.games.writing.WriteActivity;
 
 import android.util.Log;
 

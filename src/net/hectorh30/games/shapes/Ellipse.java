@@ -1,4 +1,4 @@
-package org.hectorh30.games.shapes;
+package net.hectorh30.games.shapes;
 
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
