@@ -8,9 +8,12 @@ public class Utils {
     public static final int MARGIN = 75;
     
     public static final String GRAPHICS_PATH = "gfx/";
-    public static final String IMAGES_PATH = "images/";
-    public static final String CATEGORIES_PATH = IMAGES_PATH+"Categories/";
-    public static final String GAMES_PATH = IMAGES_PATH+"Games/";
+//    public static final String IMAGES_PATH = "images/";
+    public static final String CATEGORIES_PATH = GRAPHICS_PATH + "Categories/";
+    public static final String GAMES_PATH = GRAPHICS_PATH + "Games/";
+    
+    public static final int ACTIVITY_MARGIN_TOP = 45;
+    public static final int ACTIVITY_MARGIN_LEFT = 45;
     
     public static final int RESULT_CODE_BACK = 10;
     public static final int RESULT_CODE_HOME = 11;

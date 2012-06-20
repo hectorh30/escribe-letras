@@ -3,6 +3,7 @@ package net.hectorh30.games.writing.launcher;
 import javax.microedition.khronos.opengles.GL10;
 
 import net.hectorh30.games.writing.Utils;
+import net.hectorh30.games.writing.WriteActivity;
 
 import org.anddev.andengine.engine.Engine;
 import org.anddev.andengine.engine.camera.Camera;
@@ -27,7 +28,6 @@ import org.anddev.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.anddev.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
 import org.anddev.andengine.opengl.texture.region.TextureRegion;
 import org.anddev.andengine.ui.activity.BaseGameActivity;
-import org.xml.sax.Parser;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -49,6 +49,10 @@ public class WritingGameLauncher extends BaseGameActivity implements IOnMenuItem
 	private static final int FONT_SIZE = 80;
 	private static final int FONT_COLOR = Color.WHITE;
 	
+	private final int MENU_PLAY = 0;
+	private final int MENU_QUIT = 1;
+	private final int MENU_QUIT_YES = 2;
+	private final int MENU_QUIT_NO = 3;
 
 	// ===========================================================
 	// Fields
@@ -56,16 +60,16 @@ public class WritingGameLauncher extends BaseGameActivity implements IOnMenuItem
 	
 	protected Camera mCamera;
 	
-	protected Scene mMainScene;
+	protected Scene mainScene;
 	protected Handler mHandler;
 	
-	protected MenuScene mStaticMenuScene;
-	protected MenuScene mSubMenuScene;
+	protected MenuScene mainMenuScene;
+	protected MenuScene subMenuScene;
 	private boolean isExitScene = false;
 	
 	//**************************************************************************
 	// Font variables
-	public static Font mMenuCrayonFont;
+	public Font mMenuCrayonFont;
 	protected Font mMenuBlankFont;
 	protected Font mTitleCrayonFont;
 	protected Font mQuitMessageFont;
@@ -86,7 +90,7 @@ public class WritingGameLauncher extends BaseGameActivity implements IOnMenuItem
     
     //**************************************************************************
     // to save the menu item image
-    public static TextureRegion menuItemTextureRegion;
+    public TextureRegion menuItemTextureRegion;
     //**************************************************************************
     //TextToSpeechSpanish tts;
     
@@ -143,7 +147,7 @@ public class WritingGameLauncher extends BaseGameActivity implements IOnMenuItem
         //**********************************************************************
         BitmapTextureAtlas mAutoParallaxBackgroundTexture3 = new BitmapTextureAtlas(512, 256,
                 TextureOptions.DEFAULT);
-        WritingGameLauncher.menuItemTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(
+        this.menuItemTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(
                 mAutoParallaxBackgroundTexture3, this, "MainMenu/menu_item.png", 0, 0);
         this.mEngine.getTextureManager().loadTexture(mAutoParallaxBackgroundTexture3);
         
@@ -152,7 +156,7 @@ public class WritingGameLauncher extends BaseGameActivity implements IOnMenuItem
 		// Load Font Textures
         //**********************************************************************
         BitmapTextureAtlas mFontTexture = new BitmapTextureAtlas(512, 512, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-        WritingGameLauncher.mMenuCrayonFont = FontFactory.createFromAsset(mFontTexture, this, "font/Crayon.ttf", FONT_SIZE, true, FONT_COLOR);
+        this.mMenuCrayonFont = FontFactory.createFromAsset(mFontTexture, this, "font/Crayon.ttf", FONT_SIZE, true, FONT_COLOR);
         
         BitmapTextureAtlas mFontTexture1 = new BitmapTextureAtlas(512, 512, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
         mTitleCrayonFont = FontFactory.createFromAsset(mFontTexture1, this, "font/Crayon.ttf", 120, true, Color.BLACK);
@@ -166,7 +170,7 @@ public class WritingGameLauncher extends BaseGameActivity implements IOnMenuItem
         
         // MenuActivity.mCrayonFont = new Font(mDroidFontTexture,Typeface.create(Typeface.DEFAULT, Typeface.BOLD), FONT_SIZE, true, FONT_COLOR);
         this.mEngine.getTextureManager().loadTextures(mFontTexture, mFontTexture1, mFontTexture11, mFontTexture2);
-        this.getFontManager().loadFonts(WritingGameLauncher.mMenuCrayonFont, mMenuBlankFont, mTitleCrayonFont, this.mQuitMessageFont);
+        this.getFontManager().loadFonts(this.mMenuCrayonFont, mMenuBlankFont, mTitleCrayonFont, this.mQuitMessageFont);
         
         
         
@@ -184,13 +188,13 @@ public class WritingGameLauncher extends BaseGameActivity implements IOnMenuItem
 //        MainObjects.datasource.open();
 		
 		// create the menu scene
-		this.mStaticMenuScene = this.createMainMenuScene();
+		this.mainMenuScene = this.createMainMenuScene();
 		
 		// create the menu scene
-        this.mSubMenuScene = this.createSubMenuQuitScene();
+        this.subMenuScene = this.createSubMenuQuitScene();
 		
 		// create the main scene
-		this.mMainScene = new Scene();
+		this.mainScene = new Scene();
 		
 		//**********************************************************************
 		final AutoParallaxBackground autoParallaxBackground = new AutoParallaxBackground(0, 0, 0, 7);
@@ -203,18 +207,18 @@ public class WritingGameLauncher extends BaseGameActivity implements IOnMenuItem
                 new Sprite(0, 50, this.mParallaxLayerFront)));
 		
         // set the main scene background
-        this.mMainScene.setBackground(autoParallaxBackground);
+        this.mainScene.setBackground(autoParallaxBackground);
         //**********************************************************************
         
         Text mText = new Text(0, 0, this.mTitleCrayonFont, "Escribe letras");
         mText.setPosition((CAMERA_WIDTH-mText.getWidth())/2, 50);
         
-        this.mMainScene.attachChild(mText);
+        this.mainScene.attachChild(mText);
         
         // attach the menu scene to the main scene 
-		this.mMainScene.setChildScene(mStaticMenuScene);
+		this.mainScene.setChildScene(mainMenuScene);
 		
-		return this.mMainScene;
+		return this.mainScene;
 	}
 
 //	private void parseXML() {
@@ -236,32 +240,24 @@ public class WritingGameLauncher extends BaseGameActivity implements IOnMenuItem
 	@Override
 	public void onPauseGame() {
 		super.onPauseGame();
-		//StartActivity.mMusic.pause();
 	}
 
 	@Override
 	public void onResumeGame() {
 		super.onResumeGame();
-		//mMainScene.registerEntityModifier(new ScaleAtModifier(0.5f, 0.0f, 1.0f, CAMERA_WIDTH/2, CAMERA_HEIGHT/2));
-		//mStaticMenuScene.registerEntityModifier(new ScaleAtModifier(0.5f, 0.0f, 1.0f, CAMERA_WIDTH/2, CAMERA_HEIGHT/2));
-		//System.out.println("onResumeGame");
 	}
 
 	@Override
 	public boolean onKeyDown(final int keyCode, final KeyEvent event) {
-		
-		if(keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount()==0){
-			System.out.println("MenuActivity. Back pressed");
-			
-			if(this.isExitScene ){
+		if(keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0){			
+			if(this.isExitScene){
 				this.isExitScene = false;
-			    this.mSubMenuScene.back();
+			    this.subMenuScene.back();
 				return true;
-			}
-			else{
-				mQuitText.setPosition((CAMERA_WIDTH-mQuitText.getWidth())/2, 230);
-			    this.isExitScene = true;
-			    mStaticMenuScene.setChildSceneModal(this.mSubMenuScene);
+			} else {
+				this.mQuitText.setPosition((CAMERA_WIDTH - this.mQuitText.getWidth())/2, 230);
+				this.isExitScene = true;
+				mainMenuScene.setChildSceneModal(this.subMenuScene);
 			    return true;
 			}
 		}
@@ -275,12 +271,13 @@ public class WritingGameLauncher extends BaseGameActivity implements IOnMenuItem
 			final IMenuItem pMenuItem, 
 			final float pMenuItemLocalX, 
 			final float pMenuItemLocalY) {
+		
 		switch(pMenuItem.getID()) {
-			case 0: //Play
+			case MENU_PLAY: //Play
 			    //mMainScene.registerEntityModifier(new ScaleAtModifier(0.5f, 1.0f, 0.0f, CAMERA_WIDTH/2, CAMERA_HEIGHT/2));
 				//mStaticMenuScene.registerEntityModifier(new ScaleAtModifier(0.5f, 1.0f, 0.0f, CAMERA_WIDTH/2, CAMERA_HEIGHT/2));
 				//mHandler.postDelayed(mLaunchLevel1Task,500);
-				mHandler.post(mLaunchWorldTask);
+				mHandler.post(launchWritingActivity);
 				return true;
 
 			//Review
@@ -290,21 +287,22 @@ public class WritingGameLauncher extends BaseGameActivity implements IOnMenuItem
 				//mHandler.postDelayed(mLaunchScoresTask, 500);
 //				mHandler.post(mLaunchReviewTask);
 //				return true;
-			case 2://Quit
-                /* End Activity. */
+				
+			case MENU_QUIT:
 			    mQuitText.setPosition((CAMERA_WIDTH-mQuitText.getWidth())/2, 230);
 			    this.isExitScene = true;
-			    pMenuScene.setChildSceneModal(this.mSubMenuScene);
+			    pMenuScene.setChildSceneModal(this.subMenuScene);
                 return true;
-			case 3://Are you sure? YES
-                /* End Activity. */
+                
+			case MENU_QUIT_YES:
                 this.finishActivity();
                 return true;
-			case 4://Are you sure? NO
-                /* End Activity. */
+                
+			case MENU_QUIT_NO:
 				this.isExitScene = false;
-			    this.mSubMenuScene.back();
+			    this.subMenuScene.back();
                 return true;
+                
 			default:
 				return false;
 		}
@@ -314,87 +312,95 @@ public class WritingGameLauncher extends BaseGameActivity implements IOnMenuItem
 	// Methods
 	// ===========================================================
 	protected MenuScene createMainMenuScene() {
-		MenuScene mStaticMenuScene = new MenuScene(this.mCamera);
+		MenuScene menuScene = new MenuScene(this.mCamera);
 		
-		//menu PLAY
-		//final IMenuItem playMenuItem = new ColorMenuItemDecorator( new TextMenuItem(MENU_PLAY, mCrayonFont, "Jugar"), 0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f);
-		final IMenuItem playMenuItem = new ColorMenuItemDecorator( new TextSpriteMenuItem("Jugar"), 0.5f, 0.5f, 0.5f, 0.15f, 0.49f, 0.96f);//azul2//, 0.0f, 0.68f, 0.85f);//azul1
+		// menu PLAY
+		final IMenuItem playMenuItem = new ColorMenuItemDecorator(
+				new TextSpriteMenuItem(this.MENU_PLAY,"Jugar",this.menuItemTextureRegion, this.mMenuCrayonFont),
+				0.5f, 0.5f, 0.5f, // selected color 
+				0.15f, 0.49f, 0.96f); // unselected color
 		playMenuItem.setBlendFunction(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
-		mStaticMenuScene.addMenuItem(playMenuItem);
+		menuScene.addMenuItem(playMenuItem);
 		
-		//menu REVIEW
-//		final IMenuItem reviewMenuItem = new ColorMenuItemDecorator( new TextSpriteMenuItem("Repasar"), 0.5f, 0.5f, 0.5f, 0.15f, 0.49f, 0.96f);//azul2//, 0.15f, 0.49f, 0.96f);//azul2
-//		reviewMenuItem.setBlendFunction(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
-//		mStaticMenuScene.addMenuItem(reviewMenuItem);
+		//menu blank item for spacing purposes
+		final IMenuItem tempMenuItem = new TextMenuItem(-1, this.mMenuBlankFont, "");
+  		tempMenuItem.setBlendFunction(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
+  		menuScene.addMenuItem(tempMenuItem);
 		
-//		final IMenuItem reviewMenuItem2 = new ColorMenuItemDecorator( new TextSpriteMenuItem("Salir"), 0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f);//azul2
-//        reviewMenuItem2.setBlendFunction(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
-//        mStaticMenuScene.addMenuItem(reviewMenuItem2);
+		// menu Quit
+		final IMenuItem quitMenuItem = new ColorMenuItemDecorator( 
+				new TextSpriteMenuItem(this.MENU_QUIT,"Salir",this.menuItemTextureRegion,this.mMenuCrayonFont), 
+				0.5f, 0.5f, 0.5f, // selected color 
+				1.0f, 0.0f, 0.0f); // unselected color
+        quitMenuItem.setBlendFunction(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
+        menuScene.addMenuItem(quitMenuItem);
 		
         // build animations, disable the background and set on the click listener
-		mStaticMenuScene.buildAnimations();
-		mStaticMenuScene.setBackgroundEnabled(false);
-		mStaticMenuScene.setOnMenuItemClickListener(this);
+        menuScene.buildAnimations();
+        menuScene.setBackgroundEnabled(false);
+        menuScene.setOnMenuItemClickListener(this);
 		
-		
-		return mStaticMenuScene;
+		return menuScene;
 	}
 	
 	protected MenuScene createSubMenuQuitScene() {
-        MenuScene mMenuScene = new MenuScene(this.mCamera);
+        MenuScene menuScene = new MenuScene(this.mCamera);
         
         //menu Sí
-        //final IMenuItem playMenuItem = new ColorMenuItemDecorator( new TextMenuItem(MENU_PLAY, mCrayonFont, "Jugar"), 0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f);
-        final IMenuItem playMenuItem = new ColorMenuItemDecorator( new TextSpriteMenuItem("S"+((char)237)), 0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f);
-        playMenuItem.setBlendFunction(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
-        mMenuScene.addMenuItem(playMenuItem);
+        final IMenuItem quitYesMenuItem = new ColorMenuItemDecorator( 
+        		new TextSpriteMenuItem(this.MENU_QUIT_YES,"S"+((char)237),this.menuItemTextureRegion,this.mMenuCrayonFont), 
+        		0.5f, 0.5f, 0.5f, 
+        		0.0f, 1.0f, 0.0f);
+        quitYesMenuItem.setBlendFunction(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
+        menuScene.addMenuItem(quitYesMenuItem);
         
-        //menu REVIEW
-//        final IMenuItem reviewMenuItem = new ColorMenuItemDecorator( new TextSpriteMenuItem("No"), 0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f);//azul2//, 0.15f, 0.49f, 0.96f);//azul2
-//        reviewMenuItem.setBlendFunction(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
-//        mMenuScene.addMenuItem(reviewMenuItem);
+        //menu blank item for spacing purposes
+  		final IMenuItem tempMenuItem = new TextMenuItem(-1, this.mMenuBlankFont, "");
+  		tempMenuItem.setBlendFunction(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
+  		menuScene.addMenuItem(tempMenuItem);
+        
+        //menu No
+        final IMenuItem reviewMenuItem = new ColorMenuItemDecorator( new TextSpriteMenuItem(this.MENU_QUIT_NO,"No",this.menuItemTextureRegion,this.mMenuCrayonFont), 
+        		0.5f, 0.5f, 0.5f, 
+        		1.0f, 0.0f, 0.0f);
+        reviewMenuItem.setBlendFunction(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
+        menuScene.addMenuItem(reviewMenuItem);
         
         
         // build animations, disable the background and set on the click listener
-        mMenuScene.buildAnimations();
-        mMenuScene.setBackgroundEnabled(false);
-        mMenuScene.setOnMenuItemClickListener(this);
+        menuScene.buildAnimations();
+        menuScene.setBackgroundEnabled(false);
+        menuScene.setOnMenuItemClickListener(this);
         
         
-        mQuitText = new Text(0, 0, this.mQuitMessageFont, ((char)191)+"Seguro que deseas salir?");
+        this.mQuitText = new Text(0, 0, this.mQuitMessageFont, ((char)191)+"Seguro que deseas salir?");
+        this.mQuitText.setPosition((CAMERA_WIDTH-mQuitText.getWidth())/2, 230);
         
-        mMenuScene.attachChild(mQuitText);
-        
-        mQuitText.setPosition((CAMERA_WIDTH-mQuitText.getWidth())/2, 230);
-        
-        
-        return mMenuScene;
+        menuScene.attachChild(mQuitText);
+        return menuScene;
     }
 	
 	
-	private Runnable mLaunchWorldTask = new Runnable() {
+	private Runnable launchWritingActivity = new Runnable() {
 	    @Override
         public void run() {
-            
             Bundle bundle = new Bundle();
-            
 //            World w1 = MainObjects.getWorlds().get(0);
 //            Stage st1 = w1.getStages().get(1);
 //            Word word1 = st1.getVocabulary().get(0);
-            
+//            
 //            word1.getValue();
             
-            // add the world id, stage id, and the world to send 
+	    	// add the world id, stage id, and the world to send 
 //            bundle.putString("world", w1.getId());
 //            bundle.putString("stage", st1.getId());
 //            bundle.putString("word", word1.getValue());
 //            bundle.putBoolean("evaluation", false);
             
 //            Intent myIntent = new Intent(WritingGameLauncher.this, ZooActivity.class);
-            //Intent myIntent = new Intent(MenuActivity.this, GameWordsActivity.class);
+            Intent myIntent = new Intent(WritingGameLauncher.this, WriteActivity.class);
 //            myIntent.putExtras(bundle);
-//            WritingGameLauncher.this.startActivity(myIntent);
-        	//System.out.println("Level 1.");
+            WritingGameLauncher.this.startActivity(myIntent);
 	    }
 	};
 
@@ -440,9 +446,6 @@ public class WritingGameLauncher extends BaseGameActivity implements IOnMenuItem
         //this.tts.shutdown();
         this.finish();
         this.setTransitions();
-        
         android.os.Process.killProcess(android.os.Process.myPid());
     }
-    
-	
 }

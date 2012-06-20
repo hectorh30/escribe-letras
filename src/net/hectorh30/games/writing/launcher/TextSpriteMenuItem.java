@@ -6,6 +6,7 @@ import org.anddev.andengine.engine.camera.Camera;
 import org.anddev.andengine.entity.scene.menu.item.IMenuItem;
 import org.anddev.andengine.entity.sprite.Sprite;
 import org.anddev.andengine.entity.text.Text;
+import org.anddev.andengine.opengl.font.Font;
 import org.anddev.andengine.opengl.texture.region.TextureRegion;
 
 public class TextSpriteMenuItem extends Sprite  implements IMenuItem {
@@ -17,7 +18,7 @@ public class TextSpriteMenuItem extends Sprite  implements IMenuItem {
     // Fields
     // ===========================================================
 
-    public static int counterID = 0; 
+//    public static int counterID = 0; 
     
     private Text mText;
     private Sprite mParent;
@@ -27,15 +28,15 @@ public class TextSpriteMenuItem extends Sprite  implements IMenuItem {
     // Constructors
     // ===========================================================
     
-    public TextSpriteMenuItem(final String pText) {
+    public TextSpriteMenuItem(int id, final String pText, final TextureRegion pTextureRegion, Font font) {
         
-        super(0, 0, WritingGameLauncher.menuItemTextureRegion);
-        this.mText = new Text(0, 0, WritingGameLauncher.mMenuCrayonFont, pText);
+        super(0, 0, pTextureRegion);
+        this.mText = new Text(0, 0, font, pText);
         //this.mText.setColor(255, 224, 0);
         this.setPosition(0, 0);
         
-        this.mID = TextSpriteMenuItem.counterID;
-        TextSpriteMenuItem.counterID++;
+        this.mID = id;
+//        TextSpriteMenuItem.counterID++;
     }
 
     // ===========================================================
